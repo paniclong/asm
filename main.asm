@@ -19,12 +19,12 @@ SECTION .bss
 SECTION .text
         ; Macro section
         %macro push_bp 0
-            push    rbp        ; Push old base point to stack
-            move    rbp, rsp   ; Move stack point to base pointer
+            push    rbp        ; Push old base pointer to stack
+            mov     rbp, rsp   ; Move stack point to base pointer
         %endmacro
 
         %macro pop_bp 0
-            move    rsp, rbp   ; Move base pointer to stack point
+            mov     rsp, rbp   ; Move base pointer to stack pointer
             pop     rbp        ; Pop base pointer
         %endmacro
 
@@ -56,20 +56,21 @@ _start:
         push    3
         push    f
         call    print
-        add     rsp, 16
+
+        pop_sp  2, 8
 
         push    5
         push    name
         call    print
-        add     rsp, 16
+        pop_sp  2, 8
 
         push    array
         call    each_array
-        add     rsp, 8
+        pop_sp  1, 8
 
         call    exit
 print:
-        ; push_bp
+        push_bp
 
         mov     rax, 1          ; syscall number (write)
         mov     rdi, 1          ; write to stdout
@@ -77,14 +78,12 @@ print:
         mov     rdx, [rbp+24]
         syscall
 
-        mov     rsp, rbp
-        pop     rbp
+        pop_bp
 
         ret
 
 each_array:
-        push    rbp
-        mov     rbp, rsp
+        push_bp
 
         mov     rcx, 5          ; Length of array
         mov     rdx, array      ; Move address of array to register
@@ -97,8 +96,7 @@ each_array:
         call    print
         add     rsp, 16
 
-        mov     rsp, rbp
-        pop     rbp
+        pop_bp
 
         ret
 
