@@ -2,6 +2,9 @@
 ; rbp - base pointer
 ; rsp - stack pointer
 
+; 0 01111111 10000000000000000000000
+; 0 10000000 10100000000000000000000
+
 global _start
 
 SECTION .data
@@ -20,7 +23,7 @@ SECTION .text
         ; Macro section
         %macro push_bp 0
             push    rbp        ; Push old base pointer to stack
-            mov     rbp, rsp   ; Move stack point to base pointer
+            mov     rbp, rsp   ; Move stack pointer to base pointer
         %endmacro
 
         %macro pop_bp 0

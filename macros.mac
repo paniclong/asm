@@ -1,0 +1,59 @@
+%ifndef MACROS_MAC
+    %define MACROS_MAC
+    ; Common macros for procedures
+    %macro push_bp 0
+        push    rbp        ; Push old base pointer to stack
+        mov     rbp, rsp   ; Move stack pointer to base pointer
+    %endmacro
+
+    %macro pop_bp 0
+        mov     rsp, rbp   ; Move base pointer to stack pointer
+        pop     rbp        ; Pop base pointer
+    %endmacro
+
+    %macro pop_sp 2
+        add     rsp, (%1 * %2)  ; Offset
+    %endmacro
+
+    ; Procedure for count array length
+    ; Require 3 arguments:
+    ;   1. Count of bytes (1, 2, 4, etc...)
+    ;   2. End symbol (0x24 example)
+    ;   3. Address of first element of array
+    ; Example: array_length 8 0x24 array
+    %macro array_length 3
+        %rep %0
+            push %1
+        %rotate 1
+        %endrep
+
+        call cnt_value_of_array
+
+        pop_sp %0, BYTE_SIZE_64
+    %endmacro
+
+    cnt_value_of_array:
+        push_bp
+
+        mov r8, [rbp+16]    ; Move start address of array to r8 register
+        mov r9, [rbp+24]    ; End array symbol
+        mov r10, [rbp+32]   ; Size of one element (1,2,4,8,10 bytes)
+
+        xor rcx, rcx
+    .loop:
+        cmp r9, [r8]
+        je .exit
+
+        add r8, r10
+        inc rcx
+
+        jmp .loop
+    .exit:
+        pop_bp
+
+        xor r8, r8
+        xor r9, r9
+        xor r10, r10
+
+        ret
+%endif
