@@ -17,15 +17,16 @@
 
     ; Procedure for count array length
     ; Require 3 arguments:
-    ;   1. Count of bytes (1, 2, 4, etc...)
+    ;   1. Address of first element of array
     ;   2. End symbol (0x24 example)
-    ;   3. Address of first element of array
+    ;   3. Count of bytes (1, 2, 4, etc...)
     ; Example: array_length 8 0x24 array
     %macro array_length 3
-        %rep %0
-            push %1
-        %rotate 1
-        %endrep
+        mov rdi, %1
+        mov rsi, %2
+        mov rdx, %3
+
+        xor rcx, rcx
 
         call cnt_value_of_array
 
@@ -34,26 +35,20 @@
 
     cnt_value_of_array:
         push_bp
-
-        mov r8, [rbp+16]    ; Move start address of array to r8 register
-        mov r9, [rbp+24]    ; End array symbol
-        mov r10, [rbp+32]   ; Size of one element (1,2,4,8,10 bytes)
-
-        xor rcx, rcx
     .loop:
-        cmp r9, [r8]
+        cmp rsi, [rdi]
         je .exit
 
-        add r8, r10
+        add rdi, rdx
         inc rcx
 
         jmp .loop
     .exit:
         pop_bp
 
-        xor r8, r8
-        xor r9, r9
-        xor r10, r10
+        xor rdi, rdi
+        xor rsi, rsi
+        xor rdx, rdx
 
         ret
 %endif

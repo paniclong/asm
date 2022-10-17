@@ -1,3 +1,5 @@
+default rel
+
 %include "macros.mac"
 
 global _start
@@ -7,26 +9,26 @@ global _start
 
 SECTION .data
     first_arr:      dq  1, 2, 3, 4, 5, 6, END_OF_STRING
-    second_arr:     dq  7, 8, 9, 10, 11, 12, END_OF_STRING
+    second_arr:     dq  7, 8, 9, 10, 11, 12, 1, END_OF_STRING
     value1:         dd  0x60
 
     error_msg:      dq "Length of arrays not equals", 0xA
     error_msg_len:  equ $-error_msg
 
-    float1:          dd 3.25
-    float2:          dd 1.0
-    test:            db 1
+    float1:         dd 3.25
+    float2:         dd 1.0
+    test:           db 1
 SECTION .bss
-    sum         resq    7
-    print_value resq    1
+    sum             resq    7
+    print_value     resq    1
 
 SECTION .text
 _start:
-    array_length BYTE_SIZE_64, END_OF_STRING, first_arr
+    array_length first_arr, END_OF_STRING, BYTE_SIZE_64
 
     push rcx
 
-    array_length BYTE_SIZE_64, END_OF_STRING, second_arr
+    array_length second_arr, END_OF_STRING, BYTE_SIZE_64
 
     pop rdx
 
@@ -71,7 +73,7 @@ quit:
     cmp r8, 5              ; Compare (10 iteration)
     je .quit1
 
-    mov     [print_value], r9           ; Move value (address value1) to r10 register
+    mov [print_value], r9           ; Move value (address value1) to r10 register
     ; add     qword [print_value], "0"    ; Convert first value to ASCII character
 
     mov     rax, 1          ; syscall number (write)
